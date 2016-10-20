@@ -1,36 +1,34 @@
-# -*- coding: utf-8 -*-
-
-def pega_valores():
-    # quantidade = int(input())
-    # texto = input()
-    # padrao = input()
-    # return (quantidade, texto, padrao)
-    return None
-
-def get_alfabeto(padrao):
-    '''Retorna o alfabeto que está contido no padrão.'''
-    alfabeto = []
-    for i in padrao:
-        if i not in alfabeto:
-            alfabeto.append(i)
-    return alfabeto
+from string import ascii_lowercase
 
 
-def buscar_padrao(texto, transicoes, tananho):
+def is_tamanho(tamanho, istring):
+    if len(istring) > tamanho:
+        return False
+    return True
+
+
+def trata_texto(tamanho, texto):
+    texto = texto.rstrip()
+    if len(texto) > tamanho:
+        texto = texto[:tamanho-1]
+    return texto
+
+
+def buscar_padrao(texto, transicoes):
+    '''busca o padrao no texto'''
+    tamanho = len(transicoes)
     estado = 0
     ocorrencias = []
     for count, char in enumerate(texto):
         estado = transicoes[estado][char]
-        if estado == tananho:
-            ocorrencias.append(count - tananho +1)
+        if estado == tamanho:
+            ocorrencias.append(count - tamanho +1)
             estado = 0
     return ocorrencias
 
 
-#import string as st
 def gerar_tabela(padrao):
-    alfabeto = get_alfabeto(padrao)
-    #alfabeto = st.ascii_letters+st.punctuation+st.digits+st.whitespace
+    alfabeto = ascii_lowercase + ' .,'
     TAM = len(padrao)
     transicoes = [ {caracter : 0 for caracter in alfabeto} for i in range(TAM) ]
     for count in range(TAM):
@@ -42,22 +40,36 @@ def gerar_tabela(padrao):
     return transicoes
 
 
-def main(valores):
+def imprimir_tabela(texto, padrao):
+    tabela = gerar_tabela(padrao)
+    print ('Tabela Delta:')
+    estado = 0
+    for count, char in enumerate(texto):
+        estado = tabela[estado][char]
+        print ("[{},'{}']:{}".format(estado, char, count+1))
+
+
+def main(texto, padrao):
     opcao = input()
     while opcao != 'e':
         if opcao == 's':
-            print (buscar_padrao('aabaababbababacaababaababababbcabcbacbabcabcbabcaabababaca', gerar_tabela('ababaca'), len('ababaca')))
+            ocorrencias = buscar_padrao(texto, gerar_tabela(padrao))
+            for ocorrencia in ocorrencias:
+                print (ocorrencia)
         if opcao == 'u':
-            pass
+            imprimir_tabela(texto, padrao)
         opcao = input()
     exit()
 
-# padrao = 'ababaca'
-# texto = 'aabaababbabaaabacaababaababababbcabcbacbabcabcbabcaabababaca'
-#
-# print (string_matching_FSM(texto, gerar_tabela(padrao), len(padrao)))
-
 
 if __name__ == '__main__':
-    valores = pega_valores()
-    main(valores)
+    quantidade = int(input())
+    texto = input()
+    padrao = input()
+
+    if not is_tamanho(quantidade, texto):
+        texto = trata_texto(quantidade, texto)
+    if not is_tamanho(quantidade, padrao):
+        padrao = trata_texto(quantidade, padrao)
+
+    main(texto, padrao)
