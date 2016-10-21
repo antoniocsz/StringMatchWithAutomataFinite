@@ -1,16 +1,12 @@
 from string import ascii_lowercase
 
 
-def is_tamanho(tamanho, istring):
-    if len(istring) > tamanho:
-        return False
-    return True
+def get_alfabeto():
+    return ascii_lowercase + '., '
 
 
-def trata_texto(tamanho, texto):
+def trata_texto(texto):
     texto = texto.rstrip()
-    if len(texto) > tamanho:
-        texto = texto[:tamanho-1]
     return texto
 
 
@@ -22,13 +18,13 @@ def buscar_padrao(texto, transicoes):
     for count, char in enumerate(texto):
         estado = transicoes[estado][char]
         if estado == tamanho:
-            ocorrencias.append(count - tamanho +1)
+            ocorrencias.append(count - tamanho + 2)
             estado = 0
     return ocorrencias
 
 
 def gerar_tabela(padrao):
-    alfabeto = ascii_lowercase + ' .,'
+    alfabeto = get_alfabeto()
     TAM = len(padrao)
     transicoes = [ {caracter : 0 for caracter in alfabeto} for i in range(TAM) ]
     for count in range(TAM):
@@ -36,17 +32,32 @@ def gerar_tabela(padrao):
             k = min(TAM, count+1)
             while (padrao[:count]+caracter)[-k:] != padrao[:k]:
                 k-=1
-            transicoes[count][caracter]=k
+            transicoes[count][caracter]= 0 if k < 0 else k
     return transicoes
 
 
-def imprimir_tabela(texto, padrao):
-    tabela = gerar_tabela(padrao)
+def gerar_tabela2(padrao):
+    alfabeto = get_alfabeto()
+    TAM = len(padrao)+1
+    transicoes = [ {caracter : 0 for caracter in alfabeto} for i in range(TAM+1) ]
+    for count in range(TAM):
+        for caracter in alfabeto:
+            k = min(TAM, count+1)
+            while (padrao[:count]+caracter)[-k:] != padrao[:k]:
+                k-=1
+            transicoes[count][caracter]= 0 if k < 0 else k
+    return transicoes
+
+
+def imprimir_tabela(padrao):
     print ('Tabela Delta:')
-    estado = 0
-    for count, char in enumerate(texto):
-        estado = tabela[estado][char]
-        print ("[{},'{}']:{}".format(estado, char, count+1))
+    for index, lista in enumerate(padrao):
+        for alf in get_alfabeto():
+            for char, valor in lista.items():
+                if alf == char:
+                    print ('[{}, {}]: {} '.format(index, char, valor))
+                    if alf == ' ':
+                        print ("[{}, ’{}’]: {} ".format(index, char, valor))
 
 
 def main(texto, padrao):
@@ -57,7 +68,8 @@ def main(texto, padrao):
             for ocorrencia in ocorrencias:
                 print (ocorrencia)
         if opcao == 'u':
-            imprimir_tabela(texto, padrao)
+            tabela = gerar_tabela2(padrao)
+            imprimir_tabela(tabela)
         opcao = input()
     exit()
 
@@ -66,10 +78,5 @@ if __name__ == '__main__':
     quantidade = int(input())
     texto = input()
     padrao = input()
-
-    if not is_tamanho(quantidade, texto):
-        texto = trata_texto(quantidade, texto)
-    if not is_tamanho(quantidade, padrao):
-        padrao = trata_texto(quantidade, padrao)
-
+    padrao = trata_texto(padrao)
     main(texto, padrao)
