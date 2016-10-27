@@ -39,7 +39,7 @@ def gerar_tabela(padrao):
 def gerar_tabela2(padrao):
     alfabeto = get_alfabeto()
     TAM = len(padrao)+1
-    transicoes = [ {caracter : 0 for caracter in alfabeto} for i in range(TAM+1) ]
+    transicoes = [ {caracter : 0 for caracter in alfabeto} for i in range(TAM) ]
     for count in range(TAM):
         for caracter in alfabeto:
             k = min(TAM, count+1)
